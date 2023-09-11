@@ -69,6 +69,14 @@ class Blockchain:
         :param amount: Amount
         :return: Index of the block that will hold this transaction
         """
+        if sender not in wallet_balances:
+            print(f"Sender {sender} not found in wallet balances. Transaction failed.")
+            return -1  # Return -1 to indicate failure
+        
+        if wallet_balances[sender] < amount:
+            print(f"Sender {sender} does not have enough balance to send {amount} ETH. Transaction failed.")
+            return -1  # Return -1 to indicate failure
+
         self.current_transactions.append({
             'sender': sender,
             'recipient': recipient,
@@ -110,14 +118,13 @@ print("Welcome to Ethereal Blockchain Simulator!")
 while True:
     print("\nMenu:")
     print("1. Simulate Ethereal Transactions")
-    print("2. Display Wallet Balances")
+    print("2. Display Wallet Balances and Transactions")
     print("3. Display Blockchain")
     print("4. Exit")
 
     choice = input("Enter your choice (1/2/3/4): ")
 
     if choice == "1":
-      # Simulate Ethereum transactions based on user input
         num_transactions = int(input("Enter the number of transactions you want to simulate: "))
 
         for _ in range(num_transactions):
@@ -135,6 +142,11 @@ while True:
             eth_amount = round(float(input("Enter the ETH amount to send: ")), 2)
             sender = ethereal_wallets[sender_index]
             receiver = ethereal_wallets[receiver_index]
+
+            # Check if the sender has enough balance
+            if wallet_balances[sender] < eth_amount:
+                print(f"Insufficient balance in {sender}'s wallet. Transaction canceled.")
+                continue
 
             print(f"Simulating Ethereal Transaction: {sender} -> {receiver}, Amount: {eth_amount} ETH")
 
@@ -154,7 +166,6 @@ while True:
             # Add a 1-second delay
             time.sleep(1)
 
-
         print("Transactions simulated successfully!")
 
     elif choice == "2":
@@ -162,6 +173,12 @@ while True:
         print("\nWallet Balances:")
         for wallet, balance in wallet_balances.items():
             print(f"{wallet}: {balance} ETH")
+
+        # Display recent transactions
+        print("\nRecent Transactions:")
+        for i, transaction in enumerate(transactions[-5:], start=1):
+            sender, receiver, amount = transaction
+            print(f"{i}. Sender: {sender}, Receiver: {receiver}, Amount: {amount} ETH")
 
     elif choice == "3":
         # Display the blockchain
@@ -178,4 +195,9 @@ while True:
                 print(f"  - Receiver: {transaction['recipient']}")
                 print(f"  - Amount: {transaction['amount']} ETH")
 
-        
+    elif choice == "4":
+        print("Thank you for using Ethereal Blockchain Simulator! Goodbye.")
+        break
+
+    else:
+        print("Invalid choice. Please select a valid option (1/2/3/4).")
